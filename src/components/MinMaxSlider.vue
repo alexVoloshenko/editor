@@ -1,26 +1,17 @@
 <template>
-    <v-row>
-        <v-col class="pr-4">
-            <v-slider
-                v-model="slider"
-                class="align-center"
-                :max="max"
-                :min="min"
-                hide-details
-            >
-                <template v-slot:append>
-                    <v-text-field
-                        v-model="slider"
-                        class="mt-0 pt-0"
-                        hide-details
-                        single-line
-                        type="number"
-                        style="width: 60px"
-                    ></v-text-field>
-                </template>
-            </v-slider>
-        </v-col>
-    </v-row>
+    <div class="slider-container">
+        <v-slider
+            v-model="slider"
+            class="align-center mb-4"
+            :max="max"
+            :min="min"
+            hide-details
+            @end="saveSliderValue"
+        >
+        </v-slider>
+        <v-chip>{{ slider }}</v-chip>
+        <slot></slot>
+    </div>
 </template>
 <script>
 export default {
@@ -30,8 +21,19 @@ export default {
         };
     },
     props: {
-        min: Number,
-        max: Number,
+        min: String,
+        max: String,
+    },
+    methods: {
+        saveSliderValue() {
+            this.$store.commit("setSliderValue", this.slider);
+        },
     },
 };
 </script>
+<style lang="scss">
+.slider-container {
+    width: 250px;
+    margin-left: 40px;
+}
+</style>

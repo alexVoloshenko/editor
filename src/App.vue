@@ -1,34 +1,39 @@
 <template>
     <v-app id="app">
-        <div id="container">
+        <div id="container" contenteditable="true">
             Нажмите на кнопку, чтобы соответствующий метод отработал на
             выделении, <span style="color:red">или</span> на "resetExample",
             чтобы восстановить выделение как было.
         </div>
-        <button id="btn">Set color</button>
-        <button id="btn2">green</button>
-        <button id="btn3">blue</button>
-        <span>{{ color }}</span>
-        <v-color-picker v-model="color"></v-color-picker>
-        <v-btn
-            color="primary"
-            max-width="100"
-            @click="replaceSelectedText(color)"
-            >Set color</v-btn
-        >
-        <v-btn
-            color="primary"
-            max-width="100"
-            @click="replaceSelectedText(null, color)"
-            >Set Background</v-btn
-        >
-        <v-btn
-            color="primary"
-            max-width="100"
-            @click="replaceSelectedText(null, null, '24')"
-            >Set Fontsize</v-btn
-        >
-        <MinMaxSlider></MinMaxSlider>
+        <div class="color-picker">
+            <v-color-picker v-model="color"></v-color-picker>
+            <div class="color-picker__button-container">
+                <v-btn
+                    color="primary"
+                    class="mb-4"
+                    max-width="200"
+                    @click="replaceSelectedText(color)"
+                    >Set color</v-btn
+                >
+                <v-btn
+                    color="primary"
+                    max-width="200"
+                    @click="replaceSelectedText(null, color)"
+                    >Set Background</v-btn
+                >
+            </div>
+            <MinMaxSlider min="4" max="50">
+                <v-btn
+                    color="primary"
+                    class="ml-4"
+                    max-width="150"
+                    @click="replaceSelectedText(null, null, sliderr)"
+                    >Set Fontsize</v-btn
+                >
+            </MinMaxSlider>
+        </div>
+
+        <v-row> </v-row>
     </v-app>
 </template>
 
@@ -40,29 +45,21 @@ export default {
     data() {
         return {
             color: "#000",
-            fontSize: "12px",
         };
     },
-    mounted() {
-        // let btn = document.getElementById("btn");
-        // btn.addEventListener("click", function() {
-        //     replaceSelectedText("red");
-        // });
-        // let btn2 = document.getElementById("btn2");
-        // btn2.addEventListener("click", function() {
-        //     replaceSelectedText("green");
-        // });
-        // let btn3 = document.getElementById("btn3");
-        // btn3.addEventListener("click", function() {
-        //     replaceSelectedText("blue");
-        // });
+    computed: {
+        sliderr() {
+            return this.$store.state.slider;
+        },
     },
+    mounted() {},
     methods: {
         replaceSelectedText(color, bgColor, fontSize) {
             let container = document.getElementById("container");
             var sel, range;
             let counter = 0;
-            if (window.getSelection().anchorNode) {
+            sel = window.getSelection();
+            if (sel.anchorNode && sel.toString() != "") {
                 sel = window.getSelection();
                 let text = sel.toString();
                 if (sel.rangeCount) {
@@ -79,7 +76,7 @@ export default {
                         span.style.background = bgColor;
                     } else if (fontSize) {
                         console.log("inside fontsize");
-                        span.style.fontSize = "24px";
+                        span.style.fontSize = fontSize + "px";
                     }
                     range.insertNode(span);
                 }
@@ -122,7 +119,7 @@ export default {
 
 /* eslint-disable */
 </script>
-<style>
+<style lang="scss">
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -130,5 +127,18 @@ export default {
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+    padding: 20px;
+}
+
+#container {
+    margin-bottom: 50px;
+}
+.color-picker {
+    display: flex;
+    &__button-container {
+        display: flex;
+        flex-direction: column;
+        margin-left: 40px;
+    }
 }
 </style>
