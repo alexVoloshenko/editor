@@ -1,7 +1,7 @@
 <template>
     <div class="slider-container">
         <v-slider
-            v-model="slider"
+            v-model="sliderValue"
             class="align-center mb-4"
             :max="max"
             :min="min"
@@ -9,7 +9,7 @@
             @end="saveSliderValue"
         >
         </v-slider>
-        <v-chip>{{ slider }}</v-chip>
+        <v-chip>{{ sliderValue }}</v-chip>
         <slot></slot>
     </div>
 </template>
@@ -17,7 +17,7 @@
 export default {
     data() {
         return {
-            slider: 0,
+            sliderValue: 0,
         };
     },
     props: {
@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         saveSliderValue() {
-            this.$store.commit("setSliderValue", this.slider);
+            this.$store.commit('setSliderValue', this.sliderValue);
         },
     },
 };
