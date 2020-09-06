@@ -38,7 +38,7 @@
                     >Set Fontsize</v-btn
                 >
             </MinMaxSlider>
-            <DialogComponent :showDialog="showDialog"></DialogComponent>
+            <DialogComponent v-model="showDialog"></DialogComponent>
         </div>
     </v-app>
 </template>
@@ -67,55 +67,38 @@ export default {
     methods: {
         replaceSelectedText(color, bgColor, fontSize) {
             let container = document.getElementById('container');
-            var sel, range;
+            let selection, range;
             let counter = 0;
-            sel = window.getSelection();
-            if (sel.anchorNode && sel.toString() != '') {
-                sel = window.getSelection();
-                let text = sel.toString();
-                if (sel.rangeCount) {
-                    range = sel.getRangeAt(0);
+            selection = window.getSelection();
+            if (selection.anchorNode && selection.toString() != '') {
+                range = selection.getRangeAt(0);
+                let fragment = selection.getRangeAt(0).cloneContents();
+                let span = document.createElement('span');
+                span.append(fragment);
+                range.deleteContents();
 
-                    let fragment = sel.getRangeAt(0).cloneContents();
-                    range.deleteContents();
-                    let span = document.createElement('span');
-                    span.append(fragment);
-
-                    if (span.children) {
-                        for (let i = 0; i < span.childNodes.length; i++) {
-                            if (span.childNodes[i].nodeType === 3) {
-                                let innerSpan = document.createElement('span');
-                                innerSpan.textContent =
-                                    span.childNodes[i].textContent;
-                                span.replaceChild(
-                                    innerSpan,
-                                    span.childNodes[i]
-                                );
-                            }
-                        }
-                        console.log(span);
-
-                        for (let i = 0; i < span.children.length; i++) {
-                            if (color) {
-                                span.children[i].style.color = color;
-                            } else if (bgColor) {
-                                span.children[i].style.background = bgColor;
-                            } else if (fontSize) {
-                                span.children[i].style.fontSize =
-                                    fontSize + 'px';
-                            }
+                if (span.children) {
+                    for (let i = 0; i < span.childNodes.length; i++) {
+                        if (span.childNodes[i].nodeType === 3) {
+                            let innerSpan = document.createElement('span');
+                            innerSpan.textContent =
+                                span.childNodes[i].textContent;
+                            span.replaceChild(innerSpan, span.childNodes[i]);
                         }
                     }
-
-                    if (color) {
-                        span.style.color = color;
-                    } else if (bgColor) {
-                        span.style.background = bgColor;
-                    } else if (fontSize) {
-                        span.style.fontSize = fontSize + 'px';
+                    for (let i = 0; i < span.children.length; i++) {
+                        this.setStyles(
+                            span.children[i],
+                            color,
+                            bgColor,
+                            fontSize
+                        );
                     }
-                    range.insertNode(span);
                 }
+
+                this.setStyles(span, color, bgColor, fontSize);
+                range.insertNode(span);
+
                 let spans = document.querySelectorAll('#container > span');
                 for (let i = 0; i < spans.length; i++) {
                     if (spans[i].children.length > 0) {
@@ -142,16 +125,24 @@ export default {
                         counter = 0;
                     }
                 }
-                window.getSelection().empty();
                 range.collapse();
+                window.getSelection().empty();
             } else {
                 this.showDialog = true;
             }
         },
+
+        setStyles(element, color, bgColor, fontSize) {
+            if (color) {
+                element.style.color = color;
+            } else if (bgColor) {
+                element.style.background = bgColor;
+            } else if (fontSize) {
+                element.style.fontSize = fontSize + 'px';
+            }
+        },
     },
 };
-
-/* eslint-disable */
 </script>
 <style lang="scss">
 #app {

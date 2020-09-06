@@ -1,13 +1,13 @@
 <template>
     <div class="text-center">
-        <v-dialog v-model="dialog" width="500">
+        <v-dialog :value="value" @input="$emit('input')" width="500">
             <v-card>
                 <v-card-title class="headline grey lighten-2">
-                    You don't select any text
+                    You don't selected any text
                 </v-card-title>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" text @click="dialog = false">
+                    <v-btn color="primary" text @click.native="$emit('input')">
                         OK
                     </v-btn>
                 </v-card-actions>
@@ -17,11 +17,6 @@
 </template>
 <script>
 export default {
-    props: ['showDialog'],
-    data() {
-        return {
-            dialog: false,
-        };
-    },
+    props: ['value'],
 };
 </script>
