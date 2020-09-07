@@ -68,8 +68,8 @@ export default {
         replaceSelectedText(color, bgColor, fontSize) {
             let container = document.getElementById('container');
             let selection, range;
-            let counter = 0;
             selection = window.getSelection();
+
             if (selection.anchorNode && selection.toString() != '') {
                 range = selection.getRangeAt(0);
                 let fragment = selection.getRangeAt(0).cloneContents();
@@ -86,6 +86,7 @@ export default {
                             span.replaceChild(innerSpan, span.childNodes[i]);
                         }
                     }
+
                     for (let i = 0; i < span.children.length; i++) {
                         this.setStyles(
                             span.children[i],
@@ -100,31 +101,8 @@ export default {
                 range.insertNode(span);
 
                 let spans = document.querySelectorAll('#container > span');
-                for (let i = 0; i < spans.length; i++) {
-                    if (spans[i].children.length > 0) {
-                        let newElem = spans[i].innerHTML.replace(
-                            '<span',
-                            '</span><span'
-                        );
-                        newElem = newElem.replace(/<\/span>/gi, function (
-                            match
-                        ) {
-                            counter++;
-                            return counter === 2
-                                ? `</span><span style="${spans[i].getAttribute(
-                                      'style'
-                                  )}">`
-                                : match;
-                        });
-                        let inner = container.innerHTML;
-                        let newtext = inner.replace(
-                            spans[i].innerHTML,
-                            newElem
-                        );
-                        container.innerHTML = newtext;
-                        counter = 0;
-                    }
-                }
+                this.removeNesting(spans);
+
                 range.collapse();
                 window.getSelection().empty();
             } else {
@@ -139,6 +117,30 @@ export default {
                 element.style.background = bgColor;
             } else if (fontSize) {
                 element.style.fontSize = fontSize + 'px';
+            }
+        },
+
+        removeNesting(element) {
+            let counter = 0;
+            for (let i = 0; i < element.length; i++) {
+                if (element[i].children.length > 0) {
+                    let newElem = element[i].innerHTML.replace(
+                        '<span',
+                        '</span><span'
+                    );
+                    newElem = newElem.replace(/<\/span>/gi, function(match) {
+                        counter++;
+                        return counter === 2
+                            ? `</span><span style="${element[i].getAttribute(
+                                  'style'
+                              )}">`
+                            : match;
+                    });
+                    let inner = container.innerHTML;
+                    let newtext = inner.replace(element[i].innerHTML, newElem);
+                    container.innerHTML = newtext;
+                    counter = 0;
+                }
             }
         },
     },
